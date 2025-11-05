@@ -1,86 +1,22 @@
-// fullscreen-wrapper.js
-// Initialize UnityLoader.instantiate only after a user gesture. Attempt to enter fullscreen and keep the container sized to the viewport.
+/* Original Unity template styles plus small adjustments to ensure game container is fully flexible. */
 
-(function () {
-  const startBtn = document.getElementById('startBtn');
-  const splash = document.getElementById('splashOverlay');
-  const gameContainer = document.getElementById('gameContainer');
+.webgl-content * {border: 0; margin: 0; padding: 0}
 
-  function styleContainer() {
-    gameContainer.style.width = window.innerWidth + 'px';
-    gameContainer.style.height = window.innerHeight + 'px';
-  }
+.webgl-content { width: 100vw; height: 100vh; position: relative; overflow: hidden; background: #000; }
 
-  styleContainer();
-  window.addEventListener('resize', styleContainer);
+.webgl-content .logo, .progress {position: absolute; left: 50%; top: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);}
+.webgl-content .logo {background: url('progressLogo.Light.png') no-repeat center / contain; width: 154px; height: 130px;}
+.webgl-content .progress {height: 18px; width: 141px; margin-top: 90px;}
+.webgl-content .progress .empty {background: url('progressEmpty.Light.png') no-repeat right / cover; float: right; width: 100%; height: 100%; display: inline-block;}
+.webgl-content .progress .full {background: url('progressFull.Light.png') no-repeat left / cover; float: left; width: 0%; height: 100%; display: inline-block;}
 
-  let gameInstance = null;
-  let unityLoaded = false;
+.webgl-content .logo.Dark {background-image: url('progressLogo.Dark.png');}
 
-  function enterFullscreenIfPossible(element) {
-    if (!element) return;
-    if (element.requestFullscreen) {
-      element.requestFullscreen({ navigationUI: 'hide' }).catch(()=>{});
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen();
-    }
-  }
+.webgl-content .progress.Dark .empty {background-image: url('progressEmpty.Dark.png');}
+.webgl-content .progress.Dark .full {background-image: url('progressFull.Dark.png');}
 
-  function startUnity() {
-    if (unityLoaded) return;
-    try {
-      gameInstance = UnityLoader.instantiate("gameContainer", "Build/slope.json", {
-        onProgress: function(gI, progress) {
-          if (typeof UnityProgress === 'function') {
-            try { UnityProgress(gI, progress); } catch(e) {}
-          }
-          if (progress === 1) {
-            hideSplash();
-          }
-        },
-        Module: {
-          onRuntimeInitialized: function () {
-            // runtime ready
-          }
-        }
-      });
-      unityLoaded = true;
-    } catch (err) {
-      console.error('UnityLoader.instantiate failed:', err);
-      hideSplash();
-      return;
-    }
-
-    enterFullscreenIfPossible(document.documentElement);
-  }
-
-  function hideSplash() {
-    if (splash) splash.classList.add('hidden');
-  }
-
-  startBtn.addEventListener('click', function onStartClick(e) {
-    startUnity();
-    hideSplash();
-  }, { once: true });
-
-  splash.addEventListener('click', function (e) {
-    if (e.target === startBtn) return;
-    startUnity();
-    hideSplash();
-  }, { once: true });
-
-  document.addEventListener('fullscreenchange', function () {
-    styleContainer();
-  });
-
-  document.addEventListener('visibilitychange', function () {
-    if (!gameInstance || !gameInstance.SendMessage) return;
-    try {
-      if (document.hidden) {
-        // gameInstance.SendMessage('GameManager','OnPause');
-      } else {
-        // gameInstance.SendMessage('GameManager','OnResume');
-      }
-    } catch (e) {}
-  });
-})();
+.webgl-content .footer {margin-top: 5px; height: 38px; line-height: 38px; font-family: Helvetica, Verdana, Arial, sans-serif; font-size: 18px;} 
+.webgl-content .footer .webgl-logo, .title, .fullscreen {height: 100%; display: inline-block; background: transparent center no-repeat;} 
+.webgl-content .footer .webgl-logo {background-image: url('webgl-logo.png'); width: 204px; float: left;}
+.webgl-content .footer .title {margin-right: 10px; float: right;}
+.webgl-content .footer .fullscreen {background-image: url('fullscreen.png'); width: 38px; float: right;}
